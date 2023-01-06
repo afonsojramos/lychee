@@ -789,4 +789,19 @@ mod tests {
         let res = client.check("http://\"").await.unwrap();
         assert!(res.status().is_failure());
     }
+
+    #[tokio::test]
+    async fn test_max_redirects() {
+        let mock_server = mock_server!(StatusCode::PERMANENT_REDIRECT);
+
+        let client = ClientBuilder::builder()
+            .max_redirects(0 as usize)
+            .build()
+            .client()
+            .unwrap();
+
+        let res = client.check(mock_server.uri()).await.unwrap();
+        println!("{:?}", res);
+        assert!(res.status().is_failure());
+    }
 }
